@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="dark">
+    <ion-thumbnail slot="start">
+      <img src="../../assets/easyApp-logo.svg" />
+    </ion-thumbnail>
+    <ion-title color="secondary" class="ion-text-center"
+      >EasyAppointments</ion-title
+    >
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="dark" [fullscreen]="true">
+  <div id="container">
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="12">
+          <ion-button
+            color="primary"
+            size="large"
+            (click)="onSignIn()"
+            fill="solid"
+            shape="round"
+            expand="full"
+          >
+            Sign In
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-button
+            color="primary"
+            size="large"
+            routerLink="/signup"
+            (click)="onSignUp()"
+            fill="solid"
+            shape="round"
+            expand="full"
+          >
+            Sign Up
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
+
+<!-- <ion-footer>
+  <ion-toolbar color="medium">
+    <ion-title color="secondary" class="ion-text-center"
+      >Copyright &copy; Francesco M. Barranca</ion-title
+    >
+  </ion-toolbar>
+</ion-footer> -->
