@@ -1,12 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import {
-  FormControl,
-  FormGroup,
-  Validators,
-  NG_ASYNC_VALIDATORS
-} from "@angular/forms";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { User } from "../shared/user.model";
-import { AngularFireAuth } from "@angular/fire/auth";
+import * as bcrypt from "bcryptjs";
+
+import { UserService } from "../user.service";
 
 @Component({
   selector: "app-signup",
@@ -46,7 +43,7 @@ export class SignupPage implements OnInit {
     { validators: [this.conditionalProf.bind(this), this.checkPassword] }
   );
 
-  constructor(private authFire: AngularFireAuth) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit() {}
 
@@ -65,12 +62,18 @@ export class SignupPage implements OnInit {
   }
 
   async onSubmit() {
-    const user = await this.authFire.auth.createUserWithEmailAndPassword(
+    const newUser = new User(
+      this.form.get("firstName").value,
+      this.form.get("lastName").value,
+      this.form.get("username").value,
       this.form.get("email").value,
-      this.form.get("password").value
+      this.form.get("accountType").value,
+      this.form.get("profession").value
     );
 
-    console.log(user);
+    const hash = await bcrypt.hash(this.form.get("password").value, 10);
+
+    await this.userService.signUp(newUser, hash);
 
     // const userObj = this.form.value;
     // const newUser = new User(
