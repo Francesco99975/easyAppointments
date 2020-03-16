@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { User } from "../shared/user.model";
-import * as bcrypt from "bcryptjs";
 
 import { UserService } from "../user.service";
 
@@ -63,6 +62,7 @@ export class SignupPage implements OnInit {
 
   async onSubmit() {
     const newUser = new User(
+      "tmp",
       this.form.get("firstName").value,
       this.form.get("lastName").value,
       this.form.get("username").value,
@@ -71,24 +71,6 @@ export class SignupPage implements OnInit {
       this.form.get("profession").value
     );
 
-    const hash = await bcrypt.hash(this.form.get("password").value, 10);
-
-    await this.userService.signUp(newUser, hash);
-
-    // const userObj = this.form.value;
-    // const newUser = new User(
-    //   userObj.firstName,
-    //   userObj.lastName,
-    //   userObj.username,
-    //   userObj.email,
-    //   userObj.accountType,
-    //   userObj.profession
-    // );
-
-    // console.log(newUser.getFullName());
-    // console.log(newUser.getUsername());
-    // console.log(newUser.getEmail());
-    // console.log(newUser.getType());
-    // console.log(newUser.getProfession());
+    await this.userService.signUp(newUser, this.form.get("password").value);
   }
 }

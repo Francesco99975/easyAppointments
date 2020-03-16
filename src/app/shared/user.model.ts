@@ -1,4 +1,5 @@
 export class User {
+  private uid: string;
   private firstName: string;
   private lastName: string;
   private username: string;
@@ -7,6 +8,7 @@ export class User {
   private profession: string;
 
   constructor(
+    uid: string,
     fistname: string,
     lastName: string,
     username: string,
@@ -14,6 +16,7 @@ export class User {
     accountType: string,
     profession: string
   ) {
+    this.uid = uid;
     this.firstName = fistname;
     this.lastName = lastName;
     this.username = username;
@@ -21,6 +24,22 @@ export class User {
     this.accountType = accountType;
     if (this.isProfessionist()) this.profession = profession;
     else this.profession = null;
+  }
+
+  getUid() {
+    return this.uid;
+  }
+
+  setUid(uid) {
+    this.uid = uid;
+  }
+
+  getFirstName() {
+    return this.firstName;
+  }
+
+  getLastName() {
+    return this.lastName;
   }
 
   getFullName() {
@@ -48,6 +67,8 @@ export class User {
   getProfession() {
     if (this.isProfessionist()) {
       return this.profession;
+    } else {
+      return null;
     }
   }
 }
