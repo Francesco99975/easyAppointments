@@ -13,17 +13,18 @@ import { Router } from "@angular/router";
   providedIn: "root"
 })
 export class UserService {
-  private currentUser: Observable<User>;
+  public currentUser: Observable<User>;
 
   constructor(
     private authFire: AngularFireAuth,
     private fireStore: AngularFirestore,
     private router: Router
   ) {
+    console.log("Run");
     this.currentUser = this.authFire.authState.pipe(
-      switchMap(user => {
+      switchMap(async user => {
         if (user) {
-          return this.fireStore.doc<User>(`users/${user.uid}`).valueChanges();
+          return Observable.create(await this.toUser(user.uid)); //this.fireStore.doc<User>(`users/${user.uid}`).valueChanges();
         } else {
           return of(null);
         }
@@ -61,17 +62,17 @@ export class UserService {
     const uid = fireUser.user.uid;
 
     let usr: User;
-    this.toUser(uid).then(data => (usr = data));
+    await this.toUser(uid).then(data => (usr = data));
 
     this.currentUser = of(usr);
 
-    this.logout();
+    this.router.navigate(["/customer"]);
   }
 
   async logout() {
     await this.authFire.auth.signOut();
     this.currentUser = of(null);
-    return this.router.navigate(["/home"]);
+    return this.router.navigate(["/signin"]);
   }
 
   private updateUserData(user: User) {
