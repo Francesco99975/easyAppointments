@@ -3,6 +3,8 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { User } from "../shared/user.model";
 
 import { UserService } from "../user.service";
+import { Customer } from "../shared/customer.model";
+import { Professionist } from "../shared/professionist.model";
 
 @Component({
   selector: "app-signup",
@@ -61,16 +63,30 @@ export class SignupPage implements OnInit {
   }
 
   async onSubmit() {
-    const newUser = new User(
-      "tmp",
-      this.form.get("firstName").value,
-      this.form.get("lastName").value,
-      this.form.get("username").value,
-      this.form.get("email").value,
-      this.form.get("accountType").value,
-      this.form.get("profession").value
-    );
+    let newUser: Customer | Professionist;
+
+    if (this.form.get("accountType").value === "customer") {
+      newUser = new Customer(
+        "tmp",
+        this.form.get("firstName").value,
+        this.form.get("lastName").value,
+        this.form.get("username").value,
+        this.form.get("email").value,
+        this.form.get("accountType").value
+      );
+    } else {
+      newUser = new Professionist(
+        "tmp",
+        this.form.get("firstName").value,
+        this.form.get("lastName").value,
+        this.form.get("username").value,
+        this.form.get("email").value,
+        this.form.get("accountType").value,
+        this.form.get("profession").value
+      );
+    }
 
     await this.userService.signUp(newUser, this.form.get("password").value);
+    this.form.reset();
   }
 }

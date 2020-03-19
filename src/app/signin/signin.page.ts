@@ -25,5 +25,7 @@ export class SigninPage implements OnInit {
       this.form.get("email").value,
       this.form.get("password").value
     );
+
+    this.form.reset();
   }
 }

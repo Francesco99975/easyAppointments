@@ -6,49 +6,35 @@ import {
   AngularFirestoreDocument
 } from "@angular/fire/firestore";
 import { Observable, of } from "rxjs";
-import { switchMap } from "rxjs/operators";
 import { Router } from "@angular/router";
+import { Professionist } from "./shared/professionist.model";
+import { Customer } from "./shared/customer.model";
 
 @Injectable({
   providedIn: "root"
 })
 export class UserService {
-  public currentUser: Observable<User>;
+  public currentUser: Observable<Customer | Professionist>;
 
   constructor(
     private authFire: AngularFireAuth,
     private fireStore: AngularFirestore,
     private router: Router
-  ) {
-    console.log("Run");
-    this.currentUser = this.authFire.authState.pipe(
-      switchMap(async user => {
-        if (user) {
-          return Observable.create(await this.toUser(user.uid)); //this.fireStore.doc<User>(`users/${user.uid}`).valueChanges();
-        } else {
-          return of(null);
-        }
-      })
-    );
-  }
+  ) {}
 
-  async signUp(newUser: User, password: string) {
+  async signUp(newUser: Customer | Professionist, password: string) {
     const fireUser = await this.authFire.auth.createUserWithEmailAndPassword(
       newUser.getEmail(),
       password
     );
 
-    this.updateUserData(
-      new User(
-        fireUser.user.uid,
-        newUser.getFirstName(),
-        newUser.getLastName(),
-        newUser.getUsername(),
-        newUser.getEmail(),
-        newUser.getType(),
-        newUser.getProfession()
-      )
-    );
+    newUser.setUid(fireUser.user.uid);
+
+    if (newUser instanceof Customer) {
+      this.updateCustomerData(newUser);
+    } else if (newUser instanceof Professionist) {
+      this.updateProfessionistData(newUser);
+    }
 
     this.router.navigateByUrl("/signin");
   }
@@ -61,12 +47,14 @@ export class UserService {
 
     const uid = fireUser.user.uid;
 
-    let usr: User;
+    let usr: Customer | Professionist;
     await this.toUser(uid).then(data => (usr = data));
 
     this.currentUser = of(usr);
 
-    this.router.navigate(["/customer"]);
+    if (usr instanceof Customer) this.router.navigate(["/customer"]);
+    else if (usr instanceof Professionist)
+      this.router.navigate(["/professional"]);
   }
 
   async logout() {
@@ -75,39 +63,92 @@ export class UserService {
     return this.router.navigate(["/signin"]);
   }
 
-  private updateUserData(user: User) {
+  private updateCustomerData(user: Customer) {
     const userRef: AngularFirestoreDocument<any> = this.fireStore.doc(
-      `users/${user.getUid()}`
+      `customers/${user.getUid()}`
     );
 
     return userRef.set(
       {
+        uid: user.getUid(),
         firstName: user.getFirstName(),
         lastName: user.getLastName(),
         username: user.getUsername(),
         email: user.getEmail(),
         accountType: user.getType(),
-        profession: user.getProfession()
+        favouriteProf: user.getFavourites(),
+        scheduledAppointments: user.getAppointments()
       },
       { merge: true }
     );
   }
 
-  private async toUser(uid: string): Promise<User> {
-    const userRef = this.fireStore.doc(`users/${uid}`).get();
+  private updateProfessionistData(user: Professionist) {
+    const userRef: AngularFirestoreDocument<any> = this.fireStore.doc(
+      `professionists/${user.getUid()}`
+    );
 
-    let curUsr: User;
-    await userRef.forEach(data => {
-      curUsr = new User(
-        uid,
-        data.get("firstName"),
-        data.get("lastName"),
-        data.get("username"),
-        data.get("email"),
-        data.get("accountType"),
-        data.get("profession")
-      );
-    });
+    console.log(user);
+
+    return userRef.set(
+      {
+        uid: user.getUid(),
+        firstName: user.getFirstName(),
+        lastName: user.getLastName(),
+        username: user.getUsername(),
+        email: user.getEmail(),
+        accountType: user.getType(),
+        profession: user.getProfession(),
+        settings: user.getSetting(),
+        scheduleSettings: user.getScheduleSettings(),
+        requestedAppointments: user.getSchedule()
+      },
+      { merge: true }
+    );
+  }
+
+  private async toUser(uid: string): Promise<Customer | Professionist> {
+    let cus: boolean = true;
+    let userRef = this.fireStore.doc(`customers/${uid}`).get();
+
+    if (!userRef) {
+      userRef = this.fireStore.doc(`professionists/${uid}`).get();
+      cus = false;
+    }
+
+    let curUsr: Customer | Professionist;
+
+    try {
+      await userRef.forEach(data => {
+        if (cus) {
+          curUsr = new Customer(
+            uid,
+            data.get("firstName"),
+            data.get("lastName"),
+            data.get("username"),
+            data.get("email"),
+            data.get("accountType"),
+            data.get("favouriteProf"),
+            data.get("scheduledAppointments")
+          );
+        } else {
+          curUsr = new Professionist(
+            uid,
+            data.get("firstName"),
+            data.get("lastName"),
+            data.get("username"),
+            data.get("email"),
+            data.get("accountType"),
+            data.get("profession"),
+            data.get("settings"),
+            data.get("scheduleSettings"),
+            data.get("requestedAppointments")
+          );
+        }
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
 
     return new Promise(resolve => resolve(curUsr));
   }
