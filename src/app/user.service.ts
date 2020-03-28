@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { User } from "./shared/user.model";
 import { AngularFireAuth } from "@angular/fire/auth";
 import {
   AngularFirestore,
@@ -76,6 +75,7 @@ export class UserService {
         username: user.getUsername(),
         email: user.getEmail(),
         accountType: user.getType(),
+        //To be in SQLite
         favouriteProf: user.getFavourites(),
         scheduledAppointments: user.getAppointments()
       },
@@ -99,6 +99,7 @@ export class UserService {
         email: user.getEmail(),
         accountType: user.getType(),
         profession: user.getProfession(),
+        // To be in SQLite
         settings: user.getSetting(),
         scheduleSettings: user.getScheduleSettings(),
         requestedAppointments: user.getSchedule()
