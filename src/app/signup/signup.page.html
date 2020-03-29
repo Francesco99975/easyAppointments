@@ -105,22 +105,33 @@
         <ion-row *ngIf="form.value.accountType === accountTypes[0]">
           <ion-col size="12">
             <ion-item color="dark">
-              <ion-label position="floating"
-                ><ion-text color="primary"
-                  >Select Your Profession</ion-text
-                ></ion-label
-              >
-              <ion-input formControlName="profession" type="text"></ion-input>
+              <ion-label color="primary">Search Job</ion-label>
+              <ion-searchbar
+                color="primary"
+                formControlName="profession"
+                (ionChange)="onSearchChange($event)"
+                [debounce]="250"
+                showCancelButton="250"
+              ></ion-searchbar>
             </ion-item>
           </ion-col>
         </ion-row>
+        <ion-list
+          inset="true"
+          color="dark"
+          *ngIf="jobs.length > 0 && form.value.accountType === accountTypes[0]"
+        >
+          <ion-item *ngFor="let job of jobs" (click)="onSelectJob(job)">
+            <ion-label>{{job}}</ion-label>
+          </ion-item>
+        </ion-list>
         <ion-row class="ion-text-center">
           <ion-col>
             <ion-button
               block
               color="primary"
               type="submit"
-              [disabled]="invalidForm"
+              [disabled]="form.invalid"
             >
               Sign Up
             </ion-button>

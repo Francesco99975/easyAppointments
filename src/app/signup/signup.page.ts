@@ -12,8 +12,6 @@ import { User } from "../shared/user.model";
 import { UserService } from "../user.service";
 import { Customer } from "../shared/customer.model";
 import { Professionist } from "../shared/professionist.model";
-import { Observable, pipe, timer, of } from "rxjs";
-import { switchMap, map, first } from "rxjs/operators";
 import { ApiService } from "./api.service";
 
 @Component({
@@ -23,8 +21,7 @@ import { ApiService } from "./api.service";
 })
 export class SignupPage implements OnInit {
   accountTypes = ["professional", "customer"]; //List of the account types
-  invalidForm: boolean = true;
-  interval: any;
+  jobs: string[] = [];
 
   //Sign Up Form
   form = new FormGroup(
@@ -60,32 +57,7 @@ export class SignupPage implements OnInit {
 
   constructor(private userService: UserService, private api: ApiService) {}
 
-  ngOnInit() {
-    this.form.get("accountType").valueChanges.subscribe(val => {
-      if (val === this.accountTypes[0]) {
-        //AccoutType at 0 = professional account
-        this.form
-          .get("profession")
-          .setAsyncValidators(this.validateProfession.bind(this));
-        console.log("Set");
-      } else {
-        this.form.get("profession").clearAsyncValidators();
-        console.log("Clear");
-      }
-
-      this.form.get("profession").updateValueAndValidity();
-    });
-
-    this.form.statusChanges.subscribe(val => {
-      if (val === "VALID") {
-        this.invalidForm = false;
-        console.log(val);
-      } else {
-        this.invalidForm = true;
-        console.log(val);
-      }
-    });
-  }
+  ngOnInit() {}
 
   checkPassword(form: FormGroup) {
     if (form.get("password").value !== form.get("repassword").value)
@@ -95,20 +67,20 @@ export class SignupPage implements OnInit {
 
   conditionalProf(form: FormGroup) {
     if (form.get("accountType").value === this.accountTypes[0]) {
-      return [Validators.required(form.get("profession"))];
+      return Validators.required(form.get("profession"));
     } else {
       return null;
     }
   }
 
-  // verifyProfession(form: FormGroup): Promise<any> | Observable<any> {
-  //   if (form.get("accountType").value == this.accountTypes[0])
-  //     return this.validateProfession(form.get("profession"));
-  //   else return new Promise(resolve => resolve(null));
-  // }
+  onSelectJob(job: string) {
+    this.form.get("profession").setValue(job);
+  }
 
-  validateProfession(control: AbstractControl): Promise<any> | Observable<any> {
-    return this.api.getStatus(control.value);
+  onSearchChange(event) {
+    this.api.getJobs(event.srcElement.value).subscribe(res => {
+      this.jobs = res;
+    });
   }
 
   async onSubmit() {

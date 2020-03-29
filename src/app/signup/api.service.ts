@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
+import { of } from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -8,29 +9,23 @@ import { map } from "rxjs/operators";
 export class ApiService {
   constructor(private http: HttpClient) {}
 
-  getStatus(val: string) {
-    return this.http
-      .get<any>(
-        `http://api.dataatwork.org/v1/jobs/autocomplete?contains=${val}`,
-        { observe: "response" }
-      )
-      .pipe(
-        map(res => res.status),
-        map(
-          status => {
-            if (status == 200) {
-              console.log("Good: " + status);
-              return null;
-            } else {
-              console.log("Bad: " + status);
-              return { invalidProf: true };
-            }
-          },
-          error => {
-            console.log("Error: " + error.message);
-            return { invalidProf: true };
-          }
+  getJobs(input: string) {
+    if (input.length > 0) {
+      return this.http
+        .get(
+          "http://api.dataatwork.org/v1/jobs/autocomplete?begins_with=" + input
         )
-      );
+        .pipe(
+          map((res: any[]) => {
+            let jobs: string[] = [];
+            for (let i = 0; i < res.length; i++) {
+              jobs.push(res[i].suggestion);
+            }
+            return jobs;
+          })
+        );
+    } else {
+      return of([]);
+    }
   }
 }
