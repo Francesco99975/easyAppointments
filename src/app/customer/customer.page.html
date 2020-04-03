@@ -9,29 +9,78 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content
-  color="dark"
-  [fullscreen]="true"
-  *ngIf="userService.currentUser | async as user"
->
+<ion-content color="dark" [fullscreen]="true" *ngIf="user">
   <ion-grid fixed>
     <ion-row>
       <ion-col size="12"
-        ><span class="ion-text-left" [ngStyle]="{fontSize: '1.7rem'}"
+        ><span
+          color="primary"
+          class="ion-text-left"
+          [ngStyle]="{fontSize: '1.7rem'}"
           >{{ user.getFullName() }}</span
         ></ion-col
       >
     </ion-row>
     <ion-row>
       <ion-col size="12"
-        ><span class="ion-text-left" [ngStyle]="{fontSize: '1.3rem'}">
+        ><span
+          color="primary"
+          class="ion-text-left"
+          [ngStyle]="{fontSize: '1.3rem'}"
+        >
           @{{ user.getUsername() }}
         </span></ion-col
       >
+    </ion-row>
+    <ion-row>
+      <ion-col size="12" class="ion-align-items-center">
+        <span color="secondary" class="ion-text-center">Coming up</span>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col
+        *ngIf="appointments.length > 0"
+        size="12"
+        class="ion-align-items-center"
+      >
+        <ion-list>
+          <app-appointment
+            *ngFor="let apt of appointments"
+            [professionistName]="apt.title"
+            [time]="apt.date"
+          ></app-appointment>
+        </ion-list>
+      </ion-col>
+      <ion-col
+        *ngIf="appointments.length < 1"
+        size="12"
+        class="ion-align-items-center"
+      >
+        <span color="secondary" class="ion-text-center"
+          >No appointments scheduled...</span
+        >
+      </ion-col>
     </ion-row>
   </ion-grid>
 
   <ion-button color="danger" (click)="onLogout()" block shape="round">
     Sign Out
   </ion-button>
+
+  <ion-tabs color="dark">
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="findprof">
+        <ion-icon name="search"></ion-icon>
+        <ion-label>Find Professionist</ion-label>
+      </ion-tab-button>
+      <ion-tab-button tab="favprof">
+        <ion-icon name="star"></ion-icon>
+        <ion-label>Favourites</ion-label>
+      </ion-tab-button>
+      <ion-tab-button tab="schedule">
+        <ion-icon name="calendar"></ion-icon>
+        <ion-label>Schedule</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
 </ion-content>

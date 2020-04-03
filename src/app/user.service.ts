@@ -4,7 +4,7 @@ import {
   AngularFirestore,
   AngularFirestoreDocument
 } from "@angular/fire/firestore";
-import { Observable, of } from "rxjs";
+import { of, BehaviorSubject } from "rxjs";
 import { Router } from "@angular/router";
 import { Professionist } from "./shared/professionist.model";
 import { Customer } from "./shared/customer.model";
@@ -13,7 +13,7 @@ import { Customer } from "./shared/customer.model";
   providedIn: "root"
 })
 export class UserService {
-  public currentUser: Observable<Customer | Professionist>;
+  public currentUser: BehaviorSubject<Customer | Professionist>;
 
   constructor(
     private authFire: AngularFireAuth,
@@ -49,7 +49,8 @@ export class UserService {
     let usr: Customer | Professionist;
     await this.toUser(uid).then(data => (usr = data));
 
-    this.currentUser = of(usr);
+    this.currentUser = new BehaviorSubject(usr);
+    this.currentUser.next(usr);
 
     if (usr instanceof Customer) this.router.navigate(["/customer"]);
     else if (usr instanceof Professionist)
@@ -58,7 +59,7 @@ export class UserService {
 
   async logout() {
     await this.authFire.auth.signOut();
-    this.currentUser = of(null);
+    this.currentUser = null;
     return this.router.navigate(["/signin"]);
   }
 

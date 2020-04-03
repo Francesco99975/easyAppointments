@@ -7,6 +7,18 @@ const routes: Routes = [
   {
     path: '',
     component: CustomerPage
+  },
+  {
+    path: 'findprof',
+    loadChildren: () => import('./findprof/findprof.module').then( m => m.FindprofPageModule)
+  },
+  {
+    path: 'favprof',
+    loadChildren: () => import('./favprof/favprof.module').then( m => m.FavprofPageModule)
+  },
+  {
+    path: 'schedule',
+    loadChildren: () => import('./schedule/schedule.module').then( m => m.SchedulePageModule)
   }
 ];
 

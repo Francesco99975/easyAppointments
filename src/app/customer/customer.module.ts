@@ -1,20 +1,16 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from "@ionic/angular";
 
-import { CustomerPageRoutingModule } from './customer-routing.module';
+import { CustomerPageRoutingModule } from "./customer-routing.module";
 
-import { CustomerPage } from './customer.page';
+import { CustomerPage } from "./customer.page";
+import { AppointmentComponent } from "./appointment/appointment.component";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    CustomerPageRoutingModule
-  ],
-  declarations: [CustomerPage]
+  imports: [CommonModule, FormsModule, IonicModule, CustomerPageRoutingModule],
+  declarations: [CustomerPage, AppointmentComponent]
 })
 export class CustomerPageModule {}
