@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
+import { Storage } from "@ionic/storage";
 import {
   AngularFirestore,
-  AngularFirestoreDocument
+  AngularFirestoreDocument,
 } from "@angular/fire/firestore";
 import { of, BehaviorSubject } from "rxjs";
 import { Router } from "@angular/router";
@@ -10,7 +11,7 @@ import { Professionist } from "./shared/professionist.model";
 import { Customer } from "./shared/customer.model";
 
 @Injectable({
-  providedIn: "root"
+  providedIn: "root",
 })
 export class UserService {
   public currentUser: BehaviorSubject<Customer | Professionist>;
@@ -18,8 +19,13 @@ export class UserService {
   constructor(
     private authFire: AngularFireAuth,
     private fireStore: AngularFirestore,
-    private router: Router
+    private router: Router,
+    private storage: Storage
   ) {}
+
+  setUser(user: Customer | Professionist) {
+    this.currentUser = new BehaviorSubject(user);
+  }
 
   async signUp(newUser: Customer | Professionist, password: string) {
     const fireUser = await this.authFire.auth.createUserWithEmailAndPassword(
@@ -47,19 +53,45 @@ export class UserService {
     const uid = fireUser.user.uid;
 
     let usr: Customer | Professionist;
-    await this.toUser(uid).then(data => (usr = data));
+    await this.toUser(uid).then((data) => (usr = data));
 
     this.currentUser = new BehaviorSubject(usr);
-    this.currentUser.next(usr);
 
-    if (usr instanceof Customer) this.router.navigate(["/customer"]);
-    else if (usr instanceof Professionist)
-      this.router.navigate(["/professional"]);
+    if (usr instanceof Customer) {
+      this.storage
+        .set("user", {
+          uid: usr.getUid(),
+          firstname: usr.getFirstName(),
+          lastname: usr.getLastName(),
+          username: usr.getUsername(),
+          email: usr.getEmail(),
+          accountType: usr.getType(),
+          favouriteProf: usr.getFavourites(),
+          scheduledAppointments: usr.getAppointments(),
+        })
+        .then(() => this.router.navigate(["/customer"]));
+    } else if (usr instanceof Professionist) {
+      this.storage
+        .set("user", {
+          uid: usr.getUid(),
+          firstname: usr.getFirstName(),
+          lastname: usr.getLastName(),
+          username: usr.getUsername(),
+          email: usr.getEmail(),
+          accountType: usr.getType(),
+          profession: usr.getProfession(),
+          settings: usr.getSetting(),
+          scheduleSettings: usr.getScheduleSettings(),
+          requestedAppointments: usr.getSchedule(),
+        })
+        .then(() => this.router.navigate(["/professional"]));
+    }
   }
 
   async logout() {
     await this.authFire.auth.signOut();
     this.currentUser = null;
+    await this.storage.clear();
     return this.router.navigate(["/signin"]);
   }
 
@@ -78,7 +110,7 @@ export class UserService {
         accountType: user.getType(),
         //To be in SQLite
         favouriteProf: user.getFavourites(),
-        scheduledAppointments: user.getAppointments()
+        scheduledAppointments: user.getAppointments(),
       },
       { merge: true }
     );
@@ -103,7 +135,7 @@ export class UserService {
         // To be in SQLite
         settings: user.getSetting(),
         scheduleSettings: user.getScheduleSettings(),
-        requestedAppointments: user.getSchedule()
+        requestedAppointments: user.getSchedule(),
       },
       { merge: true }
     );
@@ -121,7 +153,7 @@ export class UserService {
     let curUsr: Customer | Professionist;
 
     try {
-      await userRef.forEach(data => {
+      await userRef.forEach((data) => {
         if (cus) {
           curUsr = new Customer(
             uid,
@@ -152,6 +184,6 @@ export class UserService {
       console.log(error.message);
     }
 
-    return new Promise(resolve => resolve(curUsr));
+    return new Promise((resolve) => resolve(curUsr));
   }
 }

@@ -1,33 +1,42 @@
 import { Component, OnInit } from "@angular/core";
 import { UserService } from "../user.service";
 import { Customer } from "../shared/customer.model";
+import { Storage } from "@ionic/storage";
 
 @Component({
   selector: "app-customer",
   templateUrl: "./customer.page.html",
-  styleUrls: ["./customer.page.scss"]
+  styleUrls: ["./customer.page.scss"],
 })
 export class CustomerPage implements OnInit {
   user: Customer;
-  appointments: {
-    title: string;
-    profession: string;
-    date: Date;
-  }[] = [];
 
-  constructor(public userService: UserService) {}
+  constructor(private userService: UserService, private storage: Storage) {}
 
   ngOnInit() {
-    this.userService.currentUser.subscribe(
-      usr => {
-        if (usr instanceof Customer) this.user = usr;
-        else this.onLogout();
-      },
-      error => {
-        console.log("Customer Page Error: " + error.message);
-        this.onLogout();
-      }
-    );
+    try {
+      this.storage
+        .get("user")
+        .then((data) => {
+          this.user = new Customer(
+            data.uid,
+            data.firstname,
+            data.lastname,
+            data.username,
+            data.email,
+            data.accountType,
+            data.favouriteProf,
+            data.scheduledAppointments
+          );
+        })
+        .catch((error) => {
+          console.log("Error: " + error.message);
+        });
+    } catch (error) {
+      console.log("Storage Error: " + error.message);
+    }
+
+    this.userService.setUser(this.user);
   }
 
   onLogout() {

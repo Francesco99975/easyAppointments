@@ -4,17 +4,16 @@ import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   UrlTree,
-  Router
+  Router,
 } from "@angular/router";
 import { Observable } from "rxjs";
-import { take, map, tap } from "rxjs/operators";
-import { UserService } from "../user.service";
+import { Storage } from "@ionic/storage";
 
 @Injectable({
-  providedIn: "root"
+  providedIn: "root",
 })
 export class AuthGuard implements CanActivate {
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(private storage: Storage, private router: Router) {}
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -24,15 +23,22 @@ export class AuthGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    return this.userService.currentUser.pipe(
-      take(1),
-      map(user => !!user),
-      tap(loggedIn => {
-        if (!loggedIn) {
-          console.log("access denied!");
+    return new Promise((resolve) => {
+      this.storage
+        .get("user")
+        .then((data) => {
+          if (data) resolve(true);
+          else {
+            console.log("access denied!");
+            this.router.navigate(["/home"]);
+            resolve(false);
+          }
+        })
+        .catch((err) => {
+          console.log("Error: " + err.message);
           this.router.navigate(["/home"]);
-        }
-      })
-    );
+          resolve(false);
+        });
+    });
   }
 }

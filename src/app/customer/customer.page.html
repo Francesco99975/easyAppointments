@@ -39,20 +39,20 @@
     </ion-row>
     <ion-row>
       <ion-col
-        *ngIf="appointments.length > 0"
+        *ngIf="user.getAppointments().length > 0"
         size="12"
         class="ion-align-items-center"
       >
         <ion-list>
           <app-appointment
-            *ngFor="let apt of appointments"
+            *ngFor="let apt of user.getAppointments()"
             [professionistName]="apt.title"
             [time]="apt.date"
           ></app-appointment>
         </ion-list>
       </ion-col>
       <ion-col
-        *ngIf="appointments.length < 1"
+        *ngIf="user.getAppointments().length < 1"
         size="12"
         class="ion-align-items-center"
       >
@@ -63,7 +63,7 @@
     </ion-row>
   </ion-grid>
 
-  <ion-button color="danger" (click)="onLogout()" block shape="round">
+  <ion-button color="danger" (click)="onLogout()" expand="block" shape="round">
     Sign Out
   </ion-button>
 
