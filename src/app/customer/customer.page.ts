@@ -42,4 +42,8 @@ export class CustomerPage implements OnInit {
   onLogout() {
     this.userService.logout();
   }
+
+  onClick() {
+    console.log("Click");
+  }
 }

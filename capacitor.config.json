@@ -1,8 +1,9 @@
 {
-  "appId": "io.ionic.starter",
+  "appId": "com.easyAppointments",
   "appName": "easyAppointments",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
-  "cordova": {}
+  "cordova": {},
+  "linuxAndroidStudioPath": "/home/francesco/android-studio/bin/studio.sh"
 }
