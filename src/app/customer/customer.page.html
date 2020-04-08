@@ -1,4 +1,28 @@
-<ion-header [translucent]="true">
+<ion-menu
+  contentId="menu-content"
+  menuId="menu-content"
+  side="end"
+  type="overlay"
+>
+  <ion-header>
+    <ion-toolbar color="dark">
+      <ion-title color="secondary" class="ion-text-left">Options</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content color="dark">
+    <ion-button
+      color="danger"
+      (click)="onLogout()"
+      shape="round"
+      size="default"
+    >
+      <ion-icon slot="end" name="exit"></ion-icon>
+      Sign Out
+    </ion-button>
+  </ion-content>
+</ion-menu>
+
+<ion-header [translucent]="true" id="menu-content">
   <ion-toolbar color="dark">
     <ion-thumbnail slot="start">
       <img src="../../assets/easyApp-logo.svg" />
@@ -6,10 +30,13 @@
     <ion-title color="secondary" class="ion-text-left"
       >Easy Appointments</ion-title
     >
+    <ion-buttons slot="end">
+      <ion-menu-button color="secondary"></ion-menu-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content color="dark" [fullscreen]="true">
+<ion-content color="dark" [fullscreen]="true" padding="true">
   <ion-grid fixed *ngIf="user">
     <ion-row>
       <ion-col size="12"
@@ -37,7 +64,7 @@
       >
     </ion-row>
     <ion-row>
-      <ion-col size="12" class="ion-align-items-center">
+      <ion-col size="12" class="ion-align-self-center">
         <ion-label
           ><ion-text color="secondary" class="ion-text-center"
             >Coming up...</ion-text
@@ -49,7 +76,7 @@
       <ion-col
         *ngIf="user.getAppointments().length > 0"
         size="12"
-        class="ion-align-items-center"
+        class="ion-align-self-center"
       >
         <ion-list>
           <app-appointment
@@ -62,21 +89,13 @@
       <ion-col
         *ngIf="user.getAppointments().length < 1"
         size="12"
-        class="ion-align-items-center"
+        class="ion-align-self-center"
       >
         <ion-label
           ><ion-text color="secondary" class="ion-text-center"
             >No appointments scheduled...</ion-text
           ></ion-label
         >
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col size="12" class="ion-align-items-end">
-        <ion-button color="danger" (click)="onLogout()">
-          <ion-icon slot="end" name="exit"></ion-icon>
-          Sign Out
-        </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

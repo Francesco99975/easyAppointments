@@ -1,20 +1,20 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule } from "@angular/forms";
 
-import { IonicModule } from '@ionic/angular';
+import { IonicModule } from "@ionic/angular";
 
-import { FindprofPageRoutingModule } from './findprof-routing.module';
+import { FindprofPageRoutingModule } from "./findprof-routing.module";
 
-import { FindprofPage } from './findprof.page';
+import { FindprofPage } from "./findprof.page";
 
 @NgModule({
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     IonicModule,
-    FindprofPageRoutingModule
+    FindprofPageRoutingModule,
   ],
-  declarations: [FindprofPage]
+  declarations: [FindprofPage],
 })
 export class FindprofPageModule {}

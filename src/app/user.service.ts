@@ -14,7 +14,9 @@ import { Customer } from "./shared/customer.model";
   providedIn: "root",
 })
 export class UserService {
-  public currentUser: BehaviorSubject<Customer | Professionist>;
+  public currentUser: BehaviorSubject<
+    Customer | Professionist
+  > = new BehaviorSubject(null);
 
   constructor(
     private authFire: AngularFireAuth,
@@ -103,12 +105,11 @@ export class UserService {
     return userRef.set(
       {
         uid: user.getUid(),
-        firstName: user.getFirstName(),
-        lastName: user.getLastName(),
-        username: user.getUsername(),
-        email: user.getEmail(),
+        firstName: user.getFirstName().toLowerCase(),
+        lastName: user.getLastName().toLowerCase(),
+        username: user.getUsername().toLowerCase(),
+        email: user.getEmail().toLowerCase(),
         accountType: user.getType(),
-        //To be in SQLite
         favouriteProf: user.getFavourites(),
         scheduledAppointments: user.getAppointments(),
       },
@@ -126,13 +127,12 @@ export class UserService {
     return userRef.set(
       {
         uid: user.getUid(),
-        firstName: user.getFirstName(),
-        lastName: user.getLastName(),
-        username: user.getUsername(),
-        email: user.getEmail(),
+        firstName: user.getFirstName().toLowerCase(),
+        lastName: user.getLastName().toLowerCase(),
+        username: user.getUsername().toLowerCase(),
+        email: user.getEmail().toLowerCase(),
         accountType: user.getType(),
         profession: user.getProfession(),
-        // To be in SQLite
         settings: user.getSetting(),
         scheduleSettings: user.getScheduleSettings(),
         requestedAppointments: user.getSchedule(),
@@ -185,5 +185,63 @@ export class UserService {
     }
 
     return new Promise((resolve) => resolve(curUsr));
+  }
+
+  //Customer Fuctions
+
+  addFav(pro: any) {
+    let updatedUser: Customer;
+
+    this.storage
+      .get("user")
+      .then((data) => {
+        updatedUser = new Customer(
+          data.uid,
+          data.firstname,
+          data.lastname,
+          data.username,
+          data.email,
+          data.accountType,
+          data.favouriteProf,
+          data.scheduledAppointments
+        );
+      })
+      .then(() => {
+        updatedUser.addFavourite({
+          uid: pro.uid,
+          title: pro.lastName,
+          profession: pro.profession,
+        });
+        this.updateCustomerData(updatedUser);
+        this.currentUser.next(updatedUser);
+        console.log("aup");
+      })
+      .catch((error) => console.log(error.message));
+  }
+
+  removeFav(pro: any) {
+    let updatedUser: Customer;
+
+    this.storage
+      .get("user")
+      .then((data) => {
+        updatedUser = new Customer(
+          data.uid,
+          data.firstname,
+          data.lastname,
+          data.username,
+          data.email,
+          data.accountType,
+          data.favouriteProf,
+          data.scheduledAppointments
+        );
+      })
+      .then(() => {
+        updatedUser.removeFavourite(pro.uid);
+        this.updateCustomerData(updatedUser);
+        this.currentUser.next(updatedUser);
+        console.log("rup");
+      })
+      .catch((error) => console.log(error.message));
   }
 }

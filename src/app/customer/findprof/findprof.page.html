@@ -1,9 +1,107 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>findprof</ion-title>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title color="secondary" class="ion-text-center"
+      >Find Professionists</ion-title
+    >
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content color="dark" [fullscreen]="true">
+  <ion-grid fixed>
+    <ion-row>
+      <ion-col size="12" class="ion-align-self-center">
+        <ion-searchbar
+          color="primary"
+          (ionChange)="onSearchChange($event)"
+          [debounce]="250"
+          showCancelButton="250"
+        ></ion-searchbar>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    *ngIf="professionists.length > 0"
+  >
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="8">
+          <ion-item color="dark">
+            <ion-select
+              color="dark"
+              placeholder="Select Professionist"
+              formControlName="pro"
+            >
+              <ion-select-option
+                *ngFor="let pro of professionists"
+                [value]="pro"
+                color="secondary"
+                >{{ pro.profession + " " + (pro.lastName |
+                titlecase)}}</ion-select-option
+              >
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size="4">
+          <ion-button (click)="onFav()" *ngIf="form.value.pro">
+            <ion-icon
+              color="secondary"
+              slot="icon-only"
+              [name]="fav"
+            ></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item color="dark">
+            <ion-label
+              ><ion-text color="secondary">
+                Pick Date
+              </ion-text></ion-label
+            >
+            <ion-datetime
+              color="secondary"
+              display-format="MMM DD"
+              formControlName="date"
+            ></ion-datetime>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item color="dark">
+            <ion-label
+              ><ion-text color="secondary">
+                Pick Time
+              </ion-text></ion-label
+            >
+            <ion-datetime
+              color="secondary"
+              display-format="HH:mm"
+              formControlName="time"
+            ></ion-datetime>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-align-items-center">
+        <ion-col size="12" class="ion-align-self-center">
+          <ion-button
+            type="submit"
+            expand="block"
+            fill="clear"
+            shape="round"
+            [disabled]="form.invalid"
+          >
+            Submit Appointment
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
 </ion-content>
