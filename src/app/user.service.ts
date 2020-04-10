@@ -5,10 +5,12 @@ import {
   AngularFirestore,
   AngularFirestoreDocument,
 } from "@angular/fire/firestore";
-import { of, BehaviorSubject } from "rxjs";
+import { of, BehaviorSubject, Subject } from "rxjs";
 import { Router } from "@angular/router";
 import { Professionist } from "./shared/professionist.model";
 import { Customer } from "./shared/customer.model";
+import { map } from "rxjs/operators";
+import { HelperService } from "./helper.service";
 
 @Injectable({
   providedIn: "root",
@@ -18,11 +20,15 @@ export class UserService {
     Customer | Professionist
   > = new BehaviorSubject(null);
 
+  public appointmentError: Subject<string> = new Subject<string>();
+  public appointmentSent: Subject<string> = new Subject<string>();
+
   constructor(
     private authFire: AngularFireAuth,
     private fireStore: AngularFirestore,
     private router: Router,
-    private storage: Storage
+    private storage: Storage,
+    private helper: HelperService
   ) {}
 
   setUser(user: Customer | Professionist) {
@@ -141,44 +147,49 @@ export class UserService {
     );
   }
 
-  private async toUser(uid: string): Promise<Customer | Professionist> {
-    let cus: boolean = true;
-    let userRef = this.fireStore.doc(`customers/${uid}`).get();
+  private async toProf(uid: string): Promise<Professionist> {
+    let userRef = this.fireStore.doc(`professionists/${uid}`).get();
 
-    if (!userRef) {
-      userRef = this.fireStore.doc(`professionists/${uid}`).get();
-      cus = false;
-    }
-
-    let curUsr: Customer | Professionist;
+    let curUsr: Professionist;
 
     try {
       await userRef.forEach((data) => {
-        if (cus) {
-          curUsr = new Customer(
-            uid,
-            data.get("firstName"),
-            data.get("lastName"),
-            data.get("username"),
-            data.get("email"),
-            data.get("accountType"),
-            data.get("favouriteProf"),
-            data.get("scheduledAppointments")
-          );
-        } else {
-          curUsr = new Professionist(
-            uid,
-            data.get("firstName"),
-            data.get("lastName"),
-            data.get("username"),
-            data.get("email"),
-            data.get("accountType"),
-            data.get("profession"),
-            data.get("settings"),
-            data.get("scheduleSettings"),
-            data.get("requestedAppointments")
-          );
-        }
+        curUsr = new Professionist(
+          uid,
+          data.get("firstName"),
+          data.get("lastName"),
+          data.get("username"),
+          data.get("email"),
+          data.get("accountType"),
+          data.get("profession"),
+          data.get("settings"),
+          data.get("scheduleSettings"),
+          data.get("requestedAppointments")
+        );
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+    return new Promise((resolve) => resolve(curUsr));
+  }
+
+  private async toUser(uid: string): Promise<Customer> {
+    let userRef = this.fireStore.doc(`customers/${uid}`).get();
+
+    let curUsr: Customer;
+
+    try {
+      await userRef.forEach((data) => {
+        curUsr = new Customer(
+          uid,
+          data.get("firstName"),
+          data.get("lastName"),
+          data.get("username"),
+          data.get("email"),
+          data.get("accountType"),
+          data.get("favouriteProf"),
+          data.get("scheduledAppointments")
+        );
       });
     } catch (error) {
       console.log(error.message);
@@ -244,4 +255,89 @@ export class UserService {
       })
       .catch((error) => console.log(error.message));
   }
+
+  async submitAppointment(
+    uid: string,
+    appointment: {
+      title: string;
+      profession: string;
+      date: Date;
+    }
+  ) {
+    let prof: Professionist;
+    console.log(uid);
+    await this.toProf(uid).then((usr) => {
+      prof = usr;
+    });
+    let currentAppointments: Date[] = [];
+
+    console.log(prof);
+    console.log(prof.getEmail());
+    console.log(prof.getScheduleSettings());
+    console.log((prof.getSchedule()[0].date as any).seconds);
+
+    for (let i = 0; i < prof.getSchedule().length; i++) {
+      currentAppointments.push(
+        new Date((prof.getSchedule()[i].date as any).seconds * 1000)
+      );
+
+      console.log(currentAppointments);
+    }
+
+    if (
+      this.helper.isDayAvailable(
+        //Check if day of the week is available
+        appointment.date,
+        prof.getScheduleSettings().availableDays
+      ) &&
+      this.helper.isTimeAvailable(
+        //Check if time range is available
+        appointment.date,
+        prof.getScheduleSettings().from,
+        prof.getScheduleSettings().to
+      ) &&
+      !this.helper.isOccupied(appointment.date, currentAppointments) // Check if spot is currently not occupied
+    ) {
+      let updatedUser: Customer;
+
+      this.storage
+        .get("user")
+        .then((data) => {
+          updatedUser = new Customer(
+            data.uid,
+            data.firstname,
+            data.lastname,
+            data.username,
+            data.email,
+            data.accountType,
+            data.favouriteProf,
+            data.scheduledAppointments
+          );
+        })
+        .then(() => {
+          prof.addToSchedule({
+            customerName: updatedUser.getFullName(),
+            date: new Date(appointment.date),
+          });
+        })
+        .then(() => this.updateProfessionistData(prof))
+        .then(() =>
+          updatedUser.addAppointment({
+            title: appointment.title,
+            profession: appointment.profession,
+            date: new Date(appointment.date),
+          })
+        )
+        .then(() => this.updateCustomerData(updatedUser))
+        .then(() => {
+          this.currentUser.next(updatedUser);
+          this.appointmentSent.next("Appointment successfully sent!");
+        })
+        .catch((err) => console.log(err.message));
+    } else {
+      this.appointmentError.next("Time unavailable. Try a different date...");
+    }
+  }
+
+  cancelAppointment() {}
 }

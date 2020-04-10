@@ -36,16 +36,13 @@ export class ApiService {
     return profRef.pipe(
       map((actions) => {
         return actions.map((a) => {
-          console.log(a);
           const data: any = a.payload.doc.data();
-          console.log(data);
           return { ...data };
         });
       }),
       map((docs: any[]) => {
         console.log(docs);
         return docs.filter((data) => {
-          console.log("lastName: " + data.lastName);
           return (
             ((data.profession as String)
               .toLowerCase()

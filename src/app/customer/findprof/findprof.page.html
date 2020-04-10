@@ -67,24 +67,11 @@
             >
             <ion-datetime
               color="secondary"
-              display-format="MMM DD"
+              display-format="MMM DD, @hh:mm A"
+              picker-format="MMM DD | hh:mm A"
               formControlName="date"
-            ></ion-datetime>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="12">
-          <ion-item color="dark">
-            <ion-label
-              ><ion-text color="secondary">
-                Pick Time
-              </ion-text></ion-label
-            >
-            <ion-datetime
-              color="secondary"
-              display-format="HH:mm"
-              formControlName="time"
+              [min]="getMinDate()"
+              [max]="getMaxDate()"
             ></ion-datetime>
           </ion-item>
         </ion-col>

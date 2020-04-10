@@ -4,6 +4,7 @@ import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { UserService } from "src/app/user.service";
 import { Storage } from "@ionic/storage";
 import { Customer } from "src/app/shared/customer.model";
+import { AlertController } from "@ionic/angular";
 
 @Component({
   selector: "app-findprof",
@@ -13,17 +14,18 @@ import { Customer } from "src/app/shared/customer.model";
 export class FindprofPage implements OnInit {
   professionists: any[] = [];
   fav: string = "star-outline";
+  message: string = "";
 
   form = new FormGroup({
     pro: new FormControl(null, Validators.required),
     date: new FormControl(null, Validators.required),
-    time: new FormControl(null, Validators.required),
   });
 
   constructor(
     private api: ApiService,
     private userService: UserService,
-    private storage: Storage
+    private storage: Storage,
+    private alertCtrl: AlertController
   ) {}
 
   ngOnInit() {
@@ -47,6 +49,53 @@ export class FindprofPage implements OnInit {
         console.log("sub error");
       }
     );
+
+    this.userService.appointmentError.subscribe((error) => {
+      this.message = error;
+      this.presentAlert("Submission Error", "Could not Submit");
+      this.form.reset();
+    });
+
+    this.userService.appointmentSent.subscribe((message) => {
+      this.message = message;
+      this.presentAlert("Appointment Sent", "");
+      this.form.reset();
+    });
+  }
+
+  private appendLeadingZeroes(n: string) {
+    if (((n as unknown) as number) <= 9) {
+      return "0" + n;
+    }
+    return n;
+  }
+  async presentAlert(h: string, s: string) {
+    const alert = await this.alertCtrl.create({
+      header: h,
+      subHeader: s,
+      message: this.message,
+      buttons: ["OK"],
+    });
+
+    await alert.present();
+  }
+
+  getMinDate(): string {
+    let date: Date = new Date();
+
+    return (
+      date.getFullYear().toString() +
+      "-" +
+      this.appendLeadingZeroes(((date.getMonth() + 1) as unknown) as string) +
+      "-" +
+      this.appendLeadingZeroes(((date.getDate() + 1) as unknown) as string)
+    );
+  }
+
+  getMaxDate(): string {
+    let y: string = new Date().getFullYear().toString();
+
+    return y + "-12-31";
   }
 
   onSearchChange(event) {
@@ -69,6 +118,17 @@ export class FindprofPage implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.form.value);
+    let appointment = {
+      title: this.form.get("pro").value.lastName,
+      profession: this.form.get("pro").value.profession,
+      date: this.form.get("date").value,
+    };
+
+    console.log(appointment);
+
+    this.userService.submitAppointment(
+      this.form.get("pro").value.uid,
+      appointment
+    );
   }
 }

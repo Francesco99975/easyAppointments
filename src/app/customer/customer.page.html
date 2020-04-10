@@ -45,7 +45,7 @@
             color="primary"
             class="ion-text-left"
             [ngStyle]="{fontSize: '1.7rem'}"
-            >{{ user.getFullName() }}</ion-text
+            >{{ user.getFullName() | titlecase}}</ion-text
           ></ion-label
         ></ion-col
       >
@@ -67,27 +67,45 @@
       <ion-col size="12" class="ion-align-self-center">
         <ion-label
           ><ion-text color="secondary" class="ion-text-center"
-            >Coming up...</ion-text
+            >Today's Appointments</ion-text
           ></ion-label
         >
       </ion-col>
     </ion-row>
     <ion-row>
       <ion-col
-        *ngIf="user.getAppointments().length > 0"
+        *ngIf="getTodayAppointments().length > 0"
         size="12"
         class="ion-align-self-center"
       >
         <ion-list>
-          <app-appointment
-            *ngFor="let apt of user.getAppointments()"
-            [professionistName]="apt.title"
-            [time]="apt.date"
-          ></app-appointment>
+          <ion-item
+            color="secondary"
+            *ngFor="let app of getTodayAppointments()"
+          >
+            <ion-label>
+              <ion-text
+                color="primary"
+                class="ion-text-center"
+                [ngStyle]="{fontSize: '0.8rem'}"
+              >
+                {{ app.profession + " " + (app.title | titlecase)}}
+              </ion-text>
+            </ion-label>
+            <ion-label>
+              <ion-text
+                color="primary"
+                class="ion-text-center"
+                [ngStyle]="{fontSize: '0.8rem'}"
+              >
+                {{ getDate(app) | date: 'h:mm:ss a' }}
+              </ion-text>
+            </ion-label>
+          </ion-item>
         </ion-list>
       </ion-col>
       <ion-col
-        *ngIf="user.getAppointments().length < 1"
+        *ngIf="getTodayAppointments().length < 1"
         size="12"
         class="ion-align-self-center"
       >

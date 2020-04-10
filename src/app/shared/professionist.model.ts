@@ -5,8 +5,14 @@ export class Professionist extends User {
   private settings: { visibility: boolean };
   private scheduleSettings: {
     availableDays: Array<boolean>;
-    from: Date;
-    to: Date;
+    from: {
+      hour: number;
+      minute: number;
+    };
+    to: {
+      hour: number;
+      minute: number;
+    };
   };
   private requestedAppointments: { customerName: string; date: Date }[];
 
@@ -21,12 +27,12 @@ export class Professionist extends User {
     settings: { visibility: boolean } = { visibility: false },
     scheduleSettings: {
       availableDays: Array<boolean>;
-      from: Date;
-      to: Date;
+      from: { hour: number; minute: number };
+      to: { hour: number; minute: number };
     } = {
       availableDays: new Array<boolean>(7).fill(false),
-      from: new Date(),
-      to: new Date()
+      from: { hour: 9, minute: 0 },
+      to: { hour: 17, minute: 0 },
     },
     requestedAppointments: { customerName: string; date: Date }[] = []
   ) {
@@ -67,8 +73,14 @@ export class Professionist extends User {
 
   setScheduleSettings(val: {
     availableDays: Array<boolean>;
-    from: Date;
-    to: Date;
+    from: {
+      hour: number;
+      minute: number;
+    };
+    to: {
+      hour: number;
+      minute: number;
+    };
   }) {
     this.scheduleSettings = val;
   }

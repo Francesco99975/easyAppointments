@@ -39,11 +39,24 @@ export class CustomerPage implements OnInit {
     this.userService.setUser(this.user);
   }
 
-  onLogout() {
-    this.userService.logout();
+  getTodayAppointments() {
+    return this.user.getAppointments().filter((app) => {
+      let today = new Date();
+      let appDate = new Date((app.date as any).seconds);
+
+      return (
+        appDate.getFullYear() == today.getFullYear() &&
+        appDate.getMonth() == today.getMonth() &&
+        appDate.getDate() == today.getDate()
+      );
+    });
   }
 
-  onClick() {
-    console.log("Click");
+  getDate(app: any) {
+    return new Date((app.date as any).seconds);
+  }
+
+  onLogout() {
+    this.userService.logout();
   }
 }
