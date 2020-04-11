@@ -53,7 +53,9 @@ export class CustomerPage implements OnInit {
   }
 
   getDate(app: any) {
-    return new Date((app.date as any).seconds);
+    if ((app.date as any).seconds > 1)
+      return new Date((app.date as any).seconds * 1000);
+    else return new Date(app.date);
   }
 
   onLogout() {

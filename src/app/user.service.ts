@@ -173,23 +173,27 @@ export class UserService {
     return new Promise((resolve) => resolve(curUsr));
   }
 
-  private async toUser(uid: string): Promise<Customer> {
+  private async toUser(uid: string): Promise<Customer | Professionist> {
     let userRef = this.fireStore.doc(`customers/${uid}`).get();
 
-    let curUsr: Customer;
+    let curUsr: Customer | Professionist;
 
     try {
       await userRef.forEach((data) => {
-        curUsr = new Customer(
-          uid,
-          data.get("firstName"),
-          data.get("lastName"),
-          data.get("username"),
-          data.get("email"),
-          data.get("accountType"),
-          data.get("favouriteProf"),
-          data.get("scheduledAppointments")
-        );
+        if (data.exists) {
+          curUsr = new Customer(
+            uid,
+            data.get("firstName"),
+            data.get("lastName"),
+            data.get("username"),
+            data.get("email"),
+            data.get("accountType"),
+            data.get("favouriteProf"),
+            data.get("scheduledAppointments")
+          );
+        } else {
+          this.toProf(uid).then((data) => (curUsr = data));
+        }
       });
     } catch (error) {
       console.log(error.message);

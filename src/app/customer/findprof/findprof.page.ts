@@ -61,6 +61,25 @@ export class FindprofPage implements OnInit {
       this.presentAlert("Appointment Sent", "");
       this.form.reset();
     });
+
+    this.form.get("pro").valueChanges.subscribe((pro) => {
+      this.storage.get("user").then((data) => {
+        let tmp: Customer = new Customer(
+          data.uid,
+          data.firstname,
+          data.lastname,
+          data.username,
+          data.email,
+          data.accountType,
+          data.favouriteProf,
+          data.scheduledAppointments
+        );
+
+        if (tmp.getFavourites().findIndex((fav) => fav.uid === pro.uid) >= 0)
+          this.fav = "star";
+        else this.fav = "star-outline";
+      });
+    });
   }
 
   private appendLeadingZeroes(n: string) {
