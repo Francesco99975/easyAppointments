@@ -42,7 +42,7 @@ export class CustomerPage implements OnInit {
   getTodayAppointments() {
     return this.user.getAppointments().filter((app) => {
       let today = new Date();
-      let appDate = new Date((app.date as any).seconds);
+      let appDate = this.getDate(app);
 
       return (
         appDate.getFullYear() == today.getFullYear() &&

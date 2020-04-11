@@ -7,6 +7,14 @@ const routes: Routes = [
   {
     path: '',
     component: ProfessionalPage
+  },
+  {
+    path: 'setup',
+    loadChildren: () => import('./setup/setup.module').then( m => m.SetupPageModule)
+  },
+  {
+    path: 'requests',
+    loadChildren: () => import('./requests/requests.module').then( m => m.RequestsPageModule)
   }
 ];
 

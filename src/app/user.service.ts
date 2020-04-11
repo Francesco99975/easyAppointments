@@ -61,7 +61,16 @@ export class UserService {
     const uid = fireUser.user.uid;
 
     let usr: Customer | Professionist;
-    await this.toUser(uid).then((data) => (usr = data));
+    try {
+      usr = await this.toUser(uid);
+    } catch (error) {
+      console.log("Error: " + error);
+    }
+    console.log(usr);
+    console.log(usr == null);
+    if (usr == null) usr = await this.toProf(uid);
+
+    console.log(usr.getUsername());
 
     this.currentUser = new BehaviorSubject(usr);
 
@@ -174,32 +183,35 @@ export class UserService {
   }
 
   private async toUser(uid: string): Promise<Customer | Professionist> {
-    let userRef = this.fireStore.doc(`customers/${uid}`).get();
+    return new Promise(async (resolve, reject) => {
+      let userRef = this.fireStore.doc(`customers/${uid}`).get();
 
-    let curUsr: Customer | Professionist;
+      let curUsr: Customer | Professionist;
 
-    try {
-      await userRef.forEach((data) => {
-        if (data.exists) {
-          curUsr = new Customer(
-            uid,
-            data.get("firstName"),
-            data.get("lastName"),
-            data.get("username"),
-            data.get("email"),
-            data.get("accountType"),
-            data.get("favouriteProf"),
-            data.get("scheduledAppointments")
-          );
-        } else {
-          this.toProf(uid).then((data) => (curUsr = data));
-        }
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
-
-    return new Promise((resolve) => resolve(curUsr));
+      try {
+        await userRef.forEach((data) => {
+          if (data.exists) {
+            console.log("Here");
+            curUsr = new Customer(
+              uid,
+              data.get("firstName"),
+              data.get("lastName"),
+              data.get("username"),
+              data.get("email"),
+              data.get("accountType"),
+              data.get("favouriteProf"),
+              data.get("scheduledAppointments")
+            );
+            resolve(curUsr);
+          } else {
+            resolve(null);
+          }
+        });
+      } catch (error) {
+        console.log(error.message);
+        reject("Something went wrong");
+      }
+    });
   }
 
   //Customer Fuctions
