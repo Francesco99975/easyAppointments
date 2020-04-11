@@ -75,9 +75,13 @@ export class FindprofPage implements OnInit {
           data.scheduledAppointments
         );
 
-        if (tmp.getFavourites().findIndex((fav) => fav.uid === pro.uid) >= 0)
-          this.fav = "star";
-        else this.fav = "star-outline";
+        try {
+          if (tmp.getFavourites().findIndex((fav) => fav.uid === pro.uid) >= 0)
+            this.fav = "star";
+          else this.fav = "star-outline";
+        } catch (error) {
+          console.log("form resetted");
+        }
       });
     });
   }

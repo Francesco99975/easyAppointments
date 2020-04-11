@@ -75,6 +75,7 @@
           <ion-toggle
             color="tertiary"
             [(ngModel)]="user.getSetting().visibility"
+            (ngModelChange)="updateVisibility($event)"
           ></ion-toggle>
         </ion-item>
       </ion-col>

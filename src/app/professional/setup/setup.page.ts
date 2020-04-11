@@ -2,6 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { Storage } from "@ionic/storage";
 import { Professionist } from "src/app/shared/professionist.model";
 import { FormGroup, FormControl, FormArray, Validators } from "@angular/forms";
+import { UserService } from "src/app/user.service";
+import { AlertController } from "@ionic/angular";
 
 @Component({
   selector: "app-setup",
@@ -19,6 +21,8 @@ export class SetupPage implements OnInit {
     "Sunday",
   ];
 
+  message: string = "";
+
   availables: Array<boolean>;
   from: { hour: number; minute: number };
   to: { hour: number; minute: number };
@@ -35,7 +39,11 @@ export class SetupPage implements OnInit {
     to: new FormControl(null, Validators.required),
   });
 
-  constructor(private storage: Storage) {}
+  constructor(
+    private storage: Storage,
+    private userService: UserService,
+    private alertCtrl: AlertController
+  ) {}
 
   ngOnInit() {
     this.storage
@@ -67,6 +75,40 @@ export class SetupPage implements OnInit {
         this.form.get("saturday").setValue(this.availables[5]);
         this.form.get("sunday").setValue(this.availables[6]);
       });
+
+    this.userService.settingsChanged.subscribe((data) => {
+      this.message = data;
+      this.presentAlert("Schedule Settings", "");
+    });
+
+    this.userService.currentUser.subscribe((usr: Professionist) => {
+      if (usr instanceof Professionist) {
+        console.log("update Pro");
+        this.storage.set("user", {
+          uid: usr.getUid(),
+          firstname: usr.getFirstName(),
+          lastname: usr.getLastName(),
+          username: usr.getUsername(),
+          email: usr.getEmail(),
+          accountType: usr.getType(),
+          profession: usr.getProfession(),
+          settings: usr.getSetting(),
+          scheduleSettings: usr.getScheduleSettings(),
+          requestedAppointments: usr.getSchedule(),
+        });
+      }
+    });
+  }
+
+  async presentAlert(h: string, s: string) {
+    const alert = await this.alertCtrl.create({
+      header: h,
+      subHeader: s,
+      message: this.message,
+      buttons: ["OK"],
+    });
+
+    await alert.present();
   }
 
   private appendLeadingZeroes(n: string) {
@@ -120,5 +162,7 @@ export class SetupPage implements OnInit {
     };
 
     console.log(newScheduleSettings);
+
+    this.userService.changeScheduleSettings(newScheduleSettings);
   }
 }

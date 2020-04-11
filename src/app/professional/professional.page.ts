@@ -60,6 +60,12 @@ export class ProfessionalPage implements OnInit {
     else return new Date(app.date);
   }
 
+  updateVisibility(event: boolean) {
+    console.log(event);
+    console.log(this.user.getSetting());
+    this.userService.changeVisibility(this.user);
+  }
+
   onLogout() {
     this.userService.logout();
   }

@@ -22,6 +22,7 @@ export class UserService {
 
   public appointmentError: Subject<string> = new Subject<string>();
   public appointmentSent: Subject<string> = new Subject<string>();
+  public settingsChanged: Subject<string> = new Subject<string>();
 
   constructor(
     private authFire: AngularFireAuth,
@@ -290,14 +291,15 @@ export class UserService {
     console.log(prof);
     console.log(prof.getEmail());
     console.log(prof.getScheduleSettings());
-    console.log((prof.getSchedule()[0].date as any).seconds);
 
-    for (let i = 0; i < prof.getSchedule().length; i++) {
-      currentAppointments.push(
-        new Date((prof.getSchedule()[i].date as any).seconds * 1000)
-      );
-
-      console.log(currentAppointments);
+    if (prof.getSchedule().length > 0) {
+      console.log((prof.getSchedule()[0].date as any).seconds);
+      for (let i = 0; i < prof.getSchedule().length; i++) {
+        currentAppointments.push(
+          new Date((prof.getSchedule()[i].date as any).seconds * 1000)
+        );
+        console.log(currentAppointments);
+      }
     }
 
     if (
@@ -356,4 +358,39 @@ export class UserService {
   }
 
   cancelAppointment() {}
+
+  //Professionist Functions
+
+  changeVisibility(newProf: Professionist) {
+    this.updateProfessionistData(newProf);
+    this.currentUser.next(newProf);
+  }
+
+  changeScheduleSettings(settings: any) {
+    this.storage
+      .get("user")
+      .then((data) => {
+        let tmp: Professionist = new Professionist(
+          data.uid,
+          data.firstname,
+          data.lastname,
+          data.username,
+          data.email,
+          data.accountType,
+          data.profession,
+          data.settings,
+          data.scheduleSettings,
+          data.requestedAppointments
+        );
+
+        tmp.setScheduleSettings(settings);
+        return tmp;
+      })
+      .then((tmp) => {
+        this.updateProfessionistData(tmp);
+        return tmp;
+      })
+      .then((tmp) => this.currentUser.next(tmp))
+      .then(() => this.settingsChanged.next("Settings Successfully Changed!"));
+  }
 }

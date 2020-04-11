@@ -44,14 +44,15 @@ export class ApiService {
         console.log(docs);
         return docs.filter((data) => {
           return (
-            ((data.profession as String)
+            (((data.profession as String)
               .toLowerCase()
               .includes(input.toLowerCase()) &&
               input.length > 0) ||
-            ((data.lastName as String).includes(input.toLowerCase()) &&
-              input.length > 0) ||
-            data.userame === input.toLowerCase() ||
-            data.email === input.toLowerCase()
+              ((data.lastName as String).includes(input.toLowerCase()) &&
+                input.length > 0) ||
+              data.userame === input.toLowerCase() ||
+              data.email === input.toLowerCase()) &&
+            data.settings.visibility
           );
         });
       }),
