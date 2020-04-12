@@ -26,7 +26,9 @@ export class FindprofPage implements OnInit {
     private userService: UserService,
     private storage: Storage,
     private alertCtrl: AlertController
-  ) {}
+  ) {
+    console.log("Here");
+  }
 
   ngOnInit() {
     this.userService.currentUser.subscribe(

@@ -1,21 +1,37 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
 
-import { ProfessionalPage } from './professional.page';
+import { ProfessionalPage } from "./professional.page";
 
 const routes: Routes = [
   {
-    path: '',
-    component: ProfessionalPage
+    path: "tabs",
+    component: ProfessionalPage,
+    children: [
+      {
+        path: "setup",
+        loadChildren: () =>
+          import("./setup/setup.module").then((m) => m.SetupPageModule),
+      },
+      {
+        path: "requests",
+        loadChildren: () =>
+          import("./requests/requests.module").then(
+            (m) => m.RequestsPageModule
+          ),
+      },
+      {
+        path: "profile",
+        loadChildren: () =>
+          import("./profile/profile.module").then((m) => m.ProfilePageModule),
+      },
+    ],
   },
   {
-    path: 'setup',
-    loadChildren: () => import('./setup/setup.module').then( m => m.SetupPageModule)
+    path: "",
+    redirectTo: "tabs/profile",
+    pathMatch: "full",
   },
-  {
-    path: 'requests',
-    loadChildren: () => import('./requests/requests.module').then( m => m.RequestsPageModule)
-  }
 ];
 
 @NgModule({
