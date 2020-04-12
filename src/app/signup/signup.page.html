@@ -116,10 +116,11 @@
             </ion-item>
           </ion-col>
         </ion-row>
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
         <ion-list
           inset="true"
           color="dark"
-          *ngIf="jobs.length > 0 && form.value.accountType === accountTypes[0]"
+          *ngIf="jobs.length > 0 && form.value.accountType === accountTypes[0] && !loading"
         >
           <ion-item *ngFor="let job of jobs" (click)="onSelectJob(job)">
             <ion-label>{{job}}</ion-label>

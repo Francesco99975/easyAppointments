@@ -30,8 +30,13 @@
   >
     <ion-grid fixed>
       <ion-row>
-        <ion-col size="8">
+        <ion-col size="12">
           <ion-item color="dark">
+            <ion-label>
+              <ion-text color="secondary">
+                Choose Profesionist
+              </ion-text>
+            </ion-label>
             <ion-select
               color="dark"
               placeholder="Select Professionist"
@@ -47,7 +52,13 @@
             </ion-select>
           </ion-item>
         </ion-col>
-        <ion-col size="4">
+      </ion-row>
+      <ion-row class="ion-align-items-end" class="ion-justify-content-end">
+        <ion-col
+          size="3"
+          class="ion-align-self-end"
+          class="ion-justify-content-end"
+        >
           <ion-button (click)="onFav()" *ngIf="form.value.pro">
             <ion-icon
               color="secondary"

@@ -23,6 +23,7 @@ export class UserService {
   public appointmentError: Subject<string> = new Subject<string>();
   public appointmentSent: Subject<string> = new Subject<string>();
   public settingsChanged: Subject<string> = new Subject<string>();
+  public signInError: Subject<string> = new Subject<string>();
 
   constructor(
     private authFire: AngularFireAuth,
@@ -54,10 +55,16 @@ export class UserService {
   }
 
   async login(email: string, password: string) {
-    const fireUser = await this.authFire.auth.signInWithEmailAndPassword(
-      email,
-      password
-    );
+    let fireUser;
+    try {
+      fireUser = await this.authFire.auth.signInWithEmailAndPassword(
+        email,
+        password
+      );
+    } catch (error) {
+      this.signInError.next(error.message);
+      return;
+    }
 
     const uid = fireUser.user.uid;
 
@@ -356,8 +363,6 @@ export class UserService {
       this.appointmentError.next("Time unavailable. Try a different date...");
     }
   }
-
-  cancelAppointment() {}
 
   //Professionist Functions
 

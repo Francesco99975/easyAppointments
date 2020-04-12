@@ -5,7 +5,7 @@ import {
   Validators,
   AbstractControl,
   AsyncValidatorFn,
-  ValidationErrors
+  ValidationErrors,
 } from "@angular/forms";
 import { User } from "../shared/user.model";
 
@@ -13,51 +13,61 @@ import { UserService } from "../user.service";
 import { Customer } from "../shared/customer.model";
 import { Professionist } from "../shared/professionist.model";
 import { ApiService } from "./api.service";
+import { LoaderService } from "../loader.service";
 
 @Component({
   selector: "app-signup",
   templateUrl: "./signup.page.html",
-  styleUrls: ["./signup.page.scss"]
+  styleUrls: ["./signup.page.scss"],
 })
 export class SignupPage implements OnInit {
   accountTypes = ["professional", "customer"]; //List of the account types
   jobs: string[] = [];
+  loading: boolean = false;
 
   //Sign Up Form
   form = new FormGroup(
     {
       firstName: new FormControl(null, [
         Validators.required,
-        Validators.maxLength(15)
+        Validators.maxLength(15),
       ]),
       lastName: new FormControl(null, [
         Validators.required,
-        Validators.maxLength(15)
+        Validators.maxLength(15),
       ]),
       username: new FormControl(null, [
         Validators.required,
-        Validators.maxLength(9)
+        Validators.maxLength(9),
       ]),
       email: new FormControl(null, [Validators.required, Validators.email]),
       password: new FormControl(null, [
         Validators.required,
-        Validators.minLength(8)
+        Validators.minLength(8),
       ]),
       repassword: new FormControl(null, [
         Validators.required,
-        Validators.minLength(8)
+        Validators.minLength(8),
       ]),
       accountType: new FormControl(this.accountTypes[1], [Validators.required]),
-      profession: new FormControl(null)
+      profession: new FormControl(null),
     },
     {
-      validators: [this.conditionalProf.bind(this), this.checkPassword]
+      validators: [this.conditionalProf.bind(this), this.checkPassword],
     }
   );
 
-  constructor(private userService: UserService, private api: ApiService) {}
+  constructor(
+    private userService: UserService,
+    private api: ApiService,
+    private loader: LoaderService
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.loader.loading.subscribe((val) => {
+      this.loading = val;
+    });
+  }
 
   checkPassword(form: FormGroup) {
     if (form.get("password").value !== form.get("repassword").value)
@@ -78,8 +88,9 @@ export class SignupPage implements OnInit {
   }
 
   onSearchChange(event) {
-    this.api.getJobs(event.srcElement.value).subscribe(res => {
+    this.api.getJobs(event.srcElement.value).subscribe((res) => {
       this.jobs = res;
+      this.loader.hide();
     });
   }
 

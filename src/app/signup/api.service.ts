@@ -3,15 +3,21 @@ import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { of } from "rxjs";
 import { AngularFirestore } from "@angular/fire/firestore";
+import { LoaderService } from "../loader.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class ApiService {
-  constructor(private http: HttpClient, private fireStore: AngularFirestore) {}
+  constructor(
+    private http: HttpClient,
+    private fireStore: AngularFirestore,
+    private loader: LoaderService
+  ) {}
 
   getJobs(input: string) {
     if (input.length > 0) {
+      this.loader.show();
       return this.http
         .get(
           "http://api.dataatwork.org/v1/jobs/autocomplete?begins_with=" + input
