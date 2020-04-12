@@ -2,6 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { Professionist } from "../shared/professionist.model";
 import { UserService } from "../user.service";
 import { Storage } from "@ionic/storage";
+import { Router } from "@angular/router";
+import { Platform, NavController, AlertController } from "@ionic/angular";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-professional",
@@ -10,8 +13,48 @@ import { Storage } from "@ionic/storage";
 })
 export class ProfessionalPage implements OnInit {
   user: Professionist;
+  subExit: Subscription;
 
-  constructor(private userService: UserService, private storage: Storage) {}
+  constructor(
+    private userService: UserService,
+    private storage: Storage,
+    private router: Router,
+    private platform: Platform,
+    private navCtrl: NavController,
+    private alertCtrl: AlertController
+  ) {
+    this.subExit = this.platform.backButton.subscribeWithPriority(10000, () => {
+      if (this.router.url == "/professional") {
+        this.presentConfirm();
+      } else {
+        this.navCtrl.pop();
+      }
+    });
+  }
+
+  async presentConfirm() {
+    let alert = await this.alertCtrl.create({
+      header: "Exit Account?",
+      subHeader: "",
+      message: "Do you want to Sign Out?",
+      buttons: [
+        {
+          text: "No",
+          role: "cancel",
+          handler: () => {
+            console.log("Cancel clicked");
+          },
+        },
+        {
+          text: "Yes",
+          handler: () => {
+            this.onLogout();
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
 
   ngOnInit() {
     try {
@@ -39,6 +82,10 @@ export class ProfessionalPage implements OnInit {
     }
 
     this.userService.setUser(this.user);
+  }
+
+  ngOnDestroy() {
+    this.subExit.unsubscribe();
   }
 
   getTodayAppointments() {
