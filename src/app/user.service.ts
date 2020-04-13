@@ -74,11 +74,9 @@ export class UserService {
     } catch (error) {
       console.log("Error: " + error);
     }
-    console.log(usr);
+    // console.log(usr);
     console.log(usr == null);
     if (usr == null) usr = await this.toProf(uid);
-
-    console.log(usr.getUsername());
 
     this.currentUser = new BehaviorSubject(usr);
 
@@ -145,7 +143,7 @@ export class UserService {
       `professionists/${user.getUid()}`
     );
 
-    console.log(user);
+    // console.log(user);
 
     return userRef.set(
       {
@@ -199,7 +197,6 @@ export class UserService {
       try {
         await userRef.forEach((data) => {
           if (data.exists) {
-            console.log("Here");
             curUsr = new Customer(
               uid,
               data.get("firstName"),
@@ -249,7 +246,7 @@ export class UserService {
         });
         this.updateCustomerData(updatedUser);
         this.currentUser.next(updatedUser);
-        console.log("aup");
+        console.log("adding favourite");
       })
       .catch((error) => console.log(error.message));
   }
@@ -275,7 +272,7 @@ export class UserService {
         updatedUser.removeFavourite(pro.uid);
         this.updateCustomerData(updatedUser);
         this.currentUser.next(updatedUser);
-        console.log("rup");
+        console.log("removing favourite");
       })
       .catch((error) => console.log(error.message));
   }
@@ -289,23 +286,23 @@ export class UserService {
     }
   ) {
     let prof: Professionist;
-    console.log(uid);
+    // console.log(uid);
     await this.toProf(uid).then((usr) => {
       prof = usr;
     });
     let currentAppointments: Date[] = [];
 
-    console.log(prof);
-    console.log(prof.getEmail());
-    console.log(prof.getScheduleSettings());
+    // console.log(prof);
+    // console.log(prof.getEmail());
+    // console.log(prof.getScheduleSettings());
 
     if (prof.getSchedule().length > 0) {
-      console.log((prof.getSchedule()[0].date as any).seconds);
+      // console.log((prof.getSchedule()[0].date as any).seconds);
       for (let i = 0; i < prof.getSchedule().length; i++) {
         currentAppointments.push(
           new Date((prof.getSchedule()[i].date as any).seconds * 1000)
         );
-        console.log(currentAppointments);
+        // console.log(currentAppointments);
       }
     }
 

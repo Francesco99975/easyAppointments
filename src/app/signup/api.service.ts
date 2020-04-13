@@ -47,7 +47,7 @@ export class ApiService {
         });
       }),
       map((docs: any[]) => {
-        console.log(docs);
+        // console.log(docs);
         return docs.filter((data) => {
           return (
             (((data.profession as String)

@@ -61,8 +61,8 @@ export class ProfilePage implements OnInit {
   }
 
   updateVisibility(event: boolean) {
-    console.log(event);
-    console.log(this.user.getSetting());
+    // console.log(event);
+    // console.log(this.user.getSetting());
     this.userService.changeVisibility(this.user);
   }
 

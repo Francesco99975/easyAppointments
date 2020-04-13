@@ -26,9 +26,7 @@ export class FindprofPage implements OnInit {
     private userService: UserService,
     private storage: Storage,
     private alertCtrl: AlertController
-  ) {
-    console.log("Here");
-  }
+  ) {}
 
   ngOnInit() {
     this.userService.currentUser.subscribe(
@@ -125,7 +123,7 @@ export class FindprofPage implements OnInit {
 
   onSearchChange(event) {
     this.api.getProfessionist(event.srcElement.value).subscribe((data) => {
-      console.log(data);
+      // console.log(data);
       this.professionists = data;
     });
   }
@@ -149,7 +147,7 @@ export class FindprofPage implements OnInit {
       date: this.form.get("date").value,
     };
 
-    console.log(appointment);
+    // console.log(appointment);
 
     this.userService.submitAppointment(
       this.form.get("pro").value.uid,

@@ -137,7 +137,7 @@ export class SetupPage implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.form.value);
+    // console.log(this.form.value);
 
     let ad: boolean[] = [
       this.form.get("monday").value,
@@ -185,7 +185,7 @@ export class SetupPage implements OnInit {
       return;
     }
 
-    console.log(newScheduleSettings);
+    // console.log(newScheduleSettings);
 
     this.userService.changeScheduleSettings(newScheduleSettings);
   }

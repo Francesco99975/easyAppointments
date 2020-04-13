@@ -7,7 +7,7 @@ export class HelperService {
   constructor() {}
 
   isDayAvailable(date: Date, days: boolean[]): boolean {
-    console.log("week");
+    // console.log("Checking Weekday");
     let appDate = new Date(date);
     if (appDate.getDay() > 0) return days[appDate.getDay() - 1];
     else return days[days.length - 1];
@@ -24,9 +24,9 @@ export class HelperService {
       minute: number;
     }
   ): boolean {
-    console.log("time available?");
+    // console.log("time available?");
     let appDate = new Date(date);
-    console.log(appDate);
+    // console.log(appDate);
 
     let from = new Date(
       appDate.getFullYear(),
@@ -35,7 +35,7 @@ export class HelperService {
     );
     from.setHours(from_.hour);
     from.setMinutes(from_.minute);
-    console.log(from);
+    // console.log(from);
 
     let to = new Date(
       appDate.getFullYear(),
@@ -45,15 +45,15 @@ export class HelperService {
     to.setHours(to_.hour);
     to.setMinutes(to_.minute);
 
-    console.log(to);
+    // console.log(to);
     if (
       appDate.getTime() >= from.getTime() &&
       appDate.getTime() <= to.getTime()
     ) {
-      console.log("yes");
+      // console.log("yes");
       return true;
     } else {
-      console.log("no");
+      // console.log("no");
       return false;
     }
   }
@@ -63,26 +63,26 @@ export class HelperService {
     let occupied: boolean = false;
     let myEnd: Date = new Date(appDate);
     let arr: Date[] = otherAppointments.filter((d: Date) => {
-      console.log(d);
-      console.log(typeof d);
+      // console.log(d);
+      // console.log(typeof d);
       return (
         d.getDate() === appDate.getDate() && d.getMonth() === appDate.getMonth()
       );
     });
-    console.log("occ: " + occupied);
+    // console.log("occ: " + occupied);
 
     if (arr.length < 1) return occupied;
 
     myEnd.setHours(myEnd.getHours() + 1);
 
-    console.log(appDate);
-    console.log(myEnd);
-    console.log(arr[0]);
+    // console.log(appDate);
+    // console.log(myEnd);
+    // console.log(arr[0]);
 
     for (let i = 0; i < arr.length; i++) {
       let end: Date = new Date(arr[i]);
       end.setHours(end.getHours() + 1);
-      console.log(end);
+      // console.log(end);
       if (
         (appDate.getTime() >= arr[i].getTime() &&
           appDate.getTime() <= end.getTime()) ||
@@ -94,7 +94,7 @@ export class HelperService {
       }
     }
 
-    console.log("Occupied: " + occupied);
+    // console.log("Occupied: " + occupied);
 
     return occupied;
   }

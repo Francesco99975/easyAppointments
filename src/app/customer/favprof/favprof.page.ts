@@ -4,7 +4,6 @@ import { Customer } from "src/app/shared/customer.model";
 import { UserService } from "src/app/user.service";
 import { Router } from "@angular/router";
 import { Platform, NavController } from "@ionic/angular";
-import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-favprof",
@@ -13,20 +12,8 @@ import { Subscription } from "rxjs";
 })
 export class FavprofPage implements OnInit {
   favourites: { uid: string; title: string; profession: string }[] = [];
-  subExit: Subscription;
 
-  constructor(
-    private storage: Storage,
-    private userService: UserService,
-    private platform: Platform,
-    private navCtrl: NavController,
-    private router: Router
-  ) {
-    this.subExit = this.platform.backButton.subscribeWithPriority(10000, () => {
-      this.navCtrl.navigateBack(this.router.url);
-      console.log(this.router.url);
-    });
-  }
+  constructor(private storage: Storage, private userService: UserService) {}
 
   ngOnInit() {
     this.storage.get("user").then((data) => {
