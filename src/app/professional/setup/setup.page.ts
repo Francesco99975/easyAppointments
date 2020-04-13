@@ -161,6 +161,30 @@ export class SetupPage implements OnInit {
       },
     };
 
+    let today = new Date();
+    let fromDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      newScheduleSettings.from.hour,
+      newScheduleSettings.from.minute,
+      0
+    );
+    let toDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      newScheduleSettings.to.hour,
+      newScheduleSettings.to.minute,
+      0
+    );
+
+    if (fromDate.getTime() >= toDate.getTime()) {
+      this.message = "Invalid Time Frame!";
+      this.presentAlert("Cannot Submit", "date error");
+      return;
+    }
+
     console.log(newScheduleSettings);
 
     this.userService.changeScheduleSettings(newScheduleSettings);
